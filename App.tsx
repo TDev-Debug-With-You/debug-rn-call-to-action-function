@@ -17,6 +17,7 @@ import {
   Text,
   useColorScheme,
   View,
+  Pressable
 } from 'react-native';
 
 import {
@@ -25,7 +26,6 @@ import {
   Header,
   LearnMoreLinks,
 } from 'react-native/Libraries/NewAppScreen';
-import Button from './src/Button';
 
 const Section: React.FC<
   PropsWithChildren<{
@@ -39,7 +39,7 @@ const Section: React.FC<
         style={[
           styles.sectionTitle,
           {
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: isDarkMode ? Colors.white: "#1c3857",
           },
         ]}>
         {title}
@@ -59,11 +59,16 @@ const Section: React.FC<
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
+  const [started, setStarted] = useState(false);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  const handleStart = (): boolean => {
+    setStarted(!started)
+    return started
+  }
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -78,14 +83,16 @@ const App = () => {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Button />
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
+          <Button handle={handleStart} />
+          {
+            (!started)?
+            <Section title="Started">
+              Feature Comming soon
+            </Section>:
+            <Section title="Stopped">
+              Press the Button above to start
+            </Section>
+          }
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -109,6 +116,50 @@ const styles = StyleSheet.create({
   highlight: {
     fontWeight: '700',
   },
+  btn: {
+    backgroundColor: '#159',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 25,
+    marginVertical: 50,
+    paddingVertical: 5,
+  },
+  pressedBtn: {
+    transform: [{scale: 1.02}],
+    opacity: 0.85,
+  },
+  text: {
+    color: '#ffd',
+    fontSize: 25,
+  },
 });
 
 export default App;
+
+
+import {useState} from 'react';
+
+const Button: React.FC<{
+  handle: () => boolean
+}> = (props) => {
+  const [pressing, setPressing] = useState(false);
+
+  const countDown = (): void => {
+    console.log('cool');
+
+    props.handle()
+  };
+  return (
+    <Pressable
+      onPress={() => countDown()}
+      onPressIn={() => setPressing(true)}
+      onPressOut={() => setPressing(false)}>
+      <View style={[styles.btn, pressing && styles.pressedBtn]}>
+        <Text style={styles.text}>
+          {!props.handle ? 'Start CountDown' : 'Stop'}
+        </Text>
+      </View>
+    </Pressable>
+  );
+};
